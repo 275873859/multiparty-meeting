@@ -26,7 +26,7 @@ const touch = require('gulp-touch-cmd');
 const browserify = require('browserify');
 const watchify = require('watchify');
 const envify = require('envify/custom');
-const uglify = require('gulp-uglify');
+const minify = require('gulp-babel-minify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const del = require('del');
@@ -79,7 +79,8 @@ function bundle(options)
 		})
 		.transform('babelify',
 			{
-				presets : [ 'env', 'react-app' ]
+				presets : [ '@babel/preset-env', '@babel/preset-react' ],
+				plugins : [ '@babel/plugin-proposal-class-properties' ]
 			})
 		.transform(envify(
 			{
@@ -110,7 +111,13 @@ function bundle(options)
 			.pipe(buffer())
 			.pipe(rename(`${PKG.name}.js`))
 			.pipe(gulpif(process.env.NODE_ENV === 'production',
-				uglify()
+				minify(
+					{
+						mangle : {
+							keepClassName : true
+						}
+					}
+				)
 			))
 			.pipe(header(BANNER, BANNER_OPTIONS))
 			.pipe(gulp.dest(OUTPUT_DIR));

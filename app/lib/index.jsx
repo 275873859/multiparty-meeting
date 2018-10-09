@@ -1,3 +1,5 @@
+import '@babel/polyfill';
+
 import domready from 'domready';
 import UrlParse from 'url-parse';
 import React from 'react';
